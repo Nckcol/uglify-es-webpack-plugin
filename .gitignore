@@ -1,2 +1,5 @@
 node_modules/
 .idea/
+examples/node_modules/
+examples/build/
+**/*.log

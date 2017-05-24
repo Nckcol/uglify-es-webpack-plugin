@@ -1,0 +1,13 @@
+{
+  "name": "examples",
+  "scripts": {
+    "build": "../node_modules/.bin/webpack"
+  },
+  "devDependencies": {
+    "css-loader": "^0.28.2",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "html-webpack-plugin": "^2.28.0",
+    "style-loader": "^0.18.1",
+    "webpack": "^2.6.0"
+  }
+}
