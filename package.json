@@ -26,5 +26,9 @@
   },
   "engines": {
     "node": ">=6.4.0"
+  },
+  "devDependencies": {
+    "jest": "^20.0.4",
+    "webpack": "^2.6.0"
   }
 }
