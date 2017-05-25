@@ -9,7 +9,7 @@ This plugin uses UglifyES3 (Harmony) for ES6 optimization.
 
 - [x] Basic minification with UglifyES 3
 - [x] Providing most of options
-- [ ] User-friendly warning and error output
+- [x] User-friendly warning and error output
 - [ ] Extract comments option
 - [ ] Port tests from official [webpack repo](https://github.com/webpack/webpack) ([related issue](https://github.com/webpack-contrib/uglifyjs-webpack-plugin/issues/1))
 - [ ] Fix work with `cheap` sourcemaps (if possible)
