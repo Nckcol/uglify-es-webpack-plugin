@@ -6,39 +6,40 @@
  */
 
 const UglifyEs = require('uglify-es');
-const RawSource = require("webpack-sources").RawSource;
-const SourceMapSource = require("webpack-sources").SourceMapSource;
-const SourceMapConsumer = require("source-map").SourceMapConsumer;
-const RequestShortener = require("webpack/lib/RequestShortener");
-const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
+const RawSource = require('webpack-sources').RawSource;
+const SourceMapSource = require('webpack-sources').SourceMapSource;
+const SourceMapConsumer = require('source-map').SourceMapConsumer;
+const RequestShortener = require('webpack/lib/RequestShortener');
+const ModuleFilenameHelpers = require('webpack/lib/ModuleFilenameHelpers');
 
 class UglifyEsPlugin {
     constructor(options = {}) {
-        if (typeof options !== "object" || Array.isArray(options)) options = {};
+        if (typeof options !== 'object' || Array.isArray(options)) options = {};
         options.test = options.test || /\.js($|\?)/i;
+        options.warningsFilter = options.warningsFilter || (() => true);
         this.options = options;
     }
 
     apply(compiler) {
-        const requestShortener = new RequestShortener(compiler.context);
+        this.options.shortener = new RequestShortener(compiler.context);
         compiler.plugin('compilation', (compilation) => {
                 this.options.withSourceMap = compilation.options.devtool !== false;
                 compilation.plugin('optimize-chunk-assets', (chunks, callback) => {
                     for (let chunk of chunks) {
                         for (let file of chunk.files) {
-                            UglifyEsPlugin.optimize(compilation, requestShortener, file, this.options);
+                            UglifyEsPlugin.optimize( this.options, compilation, file);
                         }
                     }
                     callback();
                 });
                 for (let file of compilation.additionalChunkAssets) {
-                    UglifyEsPlugin.optimize(compilation, requestShortener, file, this.options);
+                    UglifyEsPlugin.optimize(this.options, compilation, file);
                 }
             }
         );
     }
 
-    static optimize(compilation, requestShortener, file, options) {
+    static optimize(options, compilation, file) {
         if (!ModuleFilenameHelpers.matchObject(options, file)) return;
 
         const asset = compilation.assets[file];
@@ -49,26 +50,26 @@ class UglifyEsPlugin {
         }
 
         const [source, map] = UglifyEsPlugin.extract(asset);
-        const result = UglifyEsPlugin.process(file, source, options);
+        const result = UglifyEsPlugin.process(options, file, source);
         const sourceMap = new SourceMapConsumer(map);
-
+        
         if (result.error) {
-            compilation.errors.push(UglifyEsPlugin.exception(file, sourceMap, result.error, requestShortener));
+            compilation.errors.push(UglifyEsPlugin.exception(options, result.error, sourceMap));
             return;
         }
 
         if (options.withSourceMap) {
-            compilation.assets[file] = new SourceMapSource(result.code, file, result.map, source, JSON.stringify(map));
+            compilation.assets[file] = new SourceMapSource(result.code, file, JSON.parse(result.map), source, map);
         } else {
             compilation.assets[file] = new RawSource(result.code);
         }
 
         // TODO: Extract Comments
 
-        asset.__UglifyJsPlugin = compilation.assets[file];
+        compilation.assets[file].__UglifyJsPlugin = compilation.assets[file];
 
-        if (result.warning && result.warning.length > 0) {
-            compilation.warnings.push(UglifyEsPlugin.warnings(file, sourceMap, result.warnings, requestShortener));
+        if (result.warnings && result.warnings.length > 0) {
+            compilation.warnings.push(UglifyEsPlugin.warnings(options, result.warnings, sourceMap));
         }
     }
 
@@ -95,7 +96,7 @@ class UglifyEsPlugin {
      * @param {Object}  options       plugin options
      * @returns {Object}
      */
-    static process(filename, source, options) {
+    static process(options, filename, source) {
         options.sourceMap = options.withSourceMap ? {filename, root: ''} : false;
         return UglifyEs.minify({[filename]: source}, UglifyEsPlugin.mapOptions(options));
     }
@@ -127,51 +128,62 @@ class UglifyEsPlugin {
     }
 
     /**
-     * Transform UglifyEs errors for webpack (maybe not even required?)
+     * Transform UglifyES errors for webpack (maybe not even required?) 
      *
-     * @param file
+     * @param options
+     * @param error
      * @param sourceMap
-     * @param uglyErrors
-     * @param requestShortener
      */
-    static exception(file, sourceMap, uglyErrors, requestShortener) {
-        const convertedError = JSON.stringify(uglyErrors);
-        
-        // TODO: Find original error place using sourceMap and requestShortener
+    static exception(options, error, sourceMap) {
 
-        const errors = new Error(
-            `UglifyEsPlugin - ${file}\n` +
-            convertedError
+        const original = sourceMap.originalPositionFor({
+            line: error.line,
+            column: error.col
+        });
+        
+        let webpackError = new Error(
+            'UglifyEsPlugin: \n' + 
+            error.message +
+            ' [' + options.shortener.shorten(original.source) + ':' + original.line + ',' + original.column + ']'
         );
 
-        errors.name = 'UglifyEsProcessingError';
+        webpackError.name = 'UglifyEsProcessingError';
 
-        return errors;
+        return webpackError;
     }
 
     /**
      * Transform UglifyEs warnings for webpack (maybe not even required?)
      *
-     * @param file
+     * @param options
+     * @param warnings
      * @param sourceMap
-     * @param uglyWarnings
-     * @param requestShortener
      */
-    static warnings(file, sourceMap, uglyWarnings, requestShortener) {
-        const convertedWarnings = uglyWarnings.map(warning => {
-            // TODO: Filter warnings with user defined function 
-            // TODO: Find original warning place using sourceMap and requestShortener
-            return JSON.stringify(warning);
+    static warnings(options, warnings, sourceMap) {
+        let convertedWarnings = [];
+        
+        warnings.forEach(warning => {
+            const warningMatch = /([^\[]+?)\s\[.+:([0-9]+),([0-9]+)\]/.exec(warning);
+            
+            const original = sourceMap.originalPositionFor({
+                line: +warningMatch[2],
+                column: +warningMatch[3]
+            });
+
+            if(!options.warningsFilter(original.source)) {
+                return;
+            }
+            
+            convertedWarnings.push(warningMatch[1] + 
+                ' [' + options.shortener.shorten(original.source) + ':' + original.line + ',' + original.column + ']');
         });
 
-        const warnings = new Error(
-            `UglifyEsPlugin - ${file}\n` +
-            convertedWarnings.join("\n")
+        const webpackWarnings = new Error(
+            'UglifyEsPlugin: \n' + 
+            convertedWarnings.join('\n')
         );
-
-        warnings.name = 'UglifyEsProcessingWarning';
-
-        return warnings;
+        webpackWarnings.name = 'UglifyEsProcessingWarning';
+        return webpackWarnings;
     }
 }
 
