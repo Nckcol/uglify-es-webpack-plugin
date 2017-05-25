@@ -31,10 +31,10 @@ module.exports = [
         },
         devtool: 'source-map',
 		plugins: [
-            new HtmlWebpackPlugin({
-                title: 'First Example'
-            }),
-            new ExtractTextPlugin("styles.css"),
+			new HtmlWebpackPlugin({
+				title: 'First Example'
+			}),
+            		new ExtractTextPlugin("styles.css"),
 			new UglifyJSPlugin(),
 		]
 	},
@@ -60,11 +60,11 @@ module.exports = [
         },
         devtool: 'cheap-source-map',
         plugins: [
+			new ExtractTextPlugin("styles.css"),
+			new HtmlWebpackPlugin({
+				title: 'Second Example'
+			}),
 			new UglifyJSPlugin(),
-            new ExtractTextPlugin("styles.css"),
-            new HtmlWebpackPlugin({
-                title: 'Second Example'
-            }),
 		]
 	}
 ];
