@@ -14,10 +14,7 @@ const ModuleFilenameHelpers = require('webpack/lib/ModuleFilenameHelpers');
 
 class UglifyEsPlugin {
     constructor(options = {}) {
-        if (typeof options !== 'object' || Array.isArray(options)) options = {};
-        options.test = options.test || /\.js($|\?)/i;
-        options.warningsFilter = options.warningsFilter || (() => true);
-        this.options = options;
+        this.options = UglifyEsPlugin.normalizeOptions(options);
     }
 
     apply(compiler) {
@@ -37,6 +34,15 @@ class UglifyEsPlugin {
                 }
             }
         );
+    }
+    
+    static normalizeOptions(options) {
+        if (typeof options !== 'object' || Array.isArray(options)) options = {};
+        options.test = options.test || /\.js($|\?)/i;
+        options.warningsFilter = options.warningsFilter || (() => true);
+        //options.comments = options.comments || /^\**!|@preserve|@license/;
+        
+        return options;
     }
 
     static optimize(options, compilation, file) {
