@@ -6,11 +6,12 @@ let HtmlWebpackPlugin = require('html-webpack-plugin');
 let PATHS = {
 	app: path.join(__dirname, 'app'),
 	another: path.join(__dirname, 'another'),
+    error: path.join(__dirname, 'warning'),
 	build: path.join(__dirname, 'build')
 };
 
 module.exports = [
-	{
+    {
 		entry: {
 			app: PATHS.app
 		},
@@ -66,5 +67,23 @@ module.exports = [
                 title: 'Second Example'
             }),
 		]
-	}
+	},
+    {
+        entry: {
+            error: PATHS.error
+        },
+        output: {
+            path: path.join(PATHS.build, 'error'),
+            filename: '[name].js'
+        },
+        devtool: 'source-map',
+        plugins: [
+            new UglifyJSPlugin({
+                warnings: true
+            }),
+            new HtmlWebpackPlugin({
+                title: 'Error Example'
+            }),
+        ]
+    }
 ];
