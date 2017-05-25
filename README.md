@@ -23,15 +23,15 @@ This plugin uses UglifyES3 (Harmony) for ES6 optimization.
 
 ### Setup `webpack.config.js`
 
-```
+```javascript
 const UglifyESPlugin = require('uglify-es-webpack-plugin');
 
-...
+/* ... */
 
 export default {
-    ...
+    /* ... */
     plugins: [
-      ...
+      /* ... */
       new UglifyEsPlugin({
         /* options */
       })
