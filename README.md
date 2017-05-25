@@ -1,15 +1,50 @@
-# Webpack2 with uglify-es as a plugin
-Webpack with UglifyJs3 / Harmony for ES6 optimization
-- webpack 2.5.1
-- uglify-es 3.0.10
+**Attention!** 
+This plugin is under development. It means in some cases it _may work incorrectly_! Be careful of using it.
+> Official repo: [uglifyjs-webpack-plugin](https://github.com/webpack-contrib/uglifyjs-webpack-plugin)
 
-Supports source maps using `devtool = 'source-map'` - others untested.
+# UglifyES Webpack Plugin
+This plugin uses UglifyES3 (Harmony) for ES6 optimization.
+
+## TODO list:
+
+- [x] Basic minification with UglifyES 3
+- [x] Providing most of options
+- [ ] User-friendly warning and error output
+- [ ] Extract comments option
+- [ ] Port tests from official [webpack repo](https://github.com/webpack/webpack) ([related issue](https://github.com/webpack-contrib/uglifyjs-webpack-plugin/issues/1))
+- [ ] Fix work with `cheap` sourcemaps (if possible)
+
+## Usage
+
+### Install
+
+`yarn add https://github.com/Nckcol/uglify-es-webpack-plugin.git --dev`
+
+
+### Setup `webpack.config.js`
+
+```
+const UglifyESPlugin = require('uglify-es-webpack-plugin');
+
+...
+
+export default {
+    ...
+    plugins: [
+      ...
+      new UglifyEsPlugin({
+        /* options */
+      })
+    ]
+};
+
+```
 
 ## Options
 
-This plugin supports UglifyJS features as discussed below:
+This plugin supports UglifyES features as discussed below:
 
- UglufyES options (see [uglify-es documentation](https://github.com/mishoo/UglifyJS2/tree/harmony#minify-options)): 
+ UglufyES options (see [UglifyES documentation](https://github.com/mishoo/UglifyJS2/tree/harmony#minify-options)): 
 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -27,8 +62,3 @@ Filter options:
 | test | RegExp, Array<RegExp> | <code>/\.js($&#124;\?)/i</code> | Test to match files against. |
 | include | RegExp, Array<RegExp> | | Test only `include` files. |
 | exclude | RegExp, Array<RegExp> | | Files to `exclude` from testing. |
-
-
-## Warning
-- does not keep comments
-- error handling is untested and minimal
