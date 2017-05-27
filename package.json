@@ -3,10 +3,28 @@
   "version": "0.0.2",
   "description": "UglifyJS3 (ES6) plugin for webpack",
   "main": "src/index.js",
-  "scripts": {},
+  "scripts": {
+    "build": "babel src -d dist",
+    "test:all": "npm run test:coverage && npm run test:lint",
+    "test": "jest --",
+    "test:coverage": "jest --coverage --",
+    "test:watch": "jest --watch --",
+    "test:lint": "eslint . --ext .js --cache",
+    "preversion": "npm run test:all && npm run build && git commit --allow-empty -am \"Update dist\"",
+    "postinstall": "node lib/post_install.js"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nckcol/uglify-es-webpack-plugin.git"
+    "url": "https://github.com/webpack-contrib/uglifyjs-webpack-plugin.git"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "moduleDirectories": [
+      "node_modules"
+    ]
   },
   "keywords": [
     "webpack",
@@ -16,9 +34,9 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/webpack-contrib/uglifyjs-webpack-plugin/issues"
   },
-  "homepage": "",
+  "homepage": "https://github.com/webpack-contrib/uglifyjs-webpack-plugin",
   "dependencies": {
     "source-map": "^0.5.6",
     "uglify-es": "^3.0.10",
@@ -28,13 +46,23 @@
     "node": ">=6.4.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-eslint": "^7.2.3",
+    "babel-jest": "^20.0.3",
+    "babel-preset-env": "^1.5.1",
     "eslint": "^3.19.0",
-    "eslint-config-airbnb": "^15.0.1",
+    "eslint-config-airbnb-base": "^11.2.0",
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-node": "^4.2.2",
+    "git-prepush-hook": "^1.0.2",
     "jest": "^20.0.4",
     "should": "^11.2.1",
     "sinon": "^2.3.1",
+    "sync-exec": "^0.6.2",
     "webpack": "^2.6.0"
-  }
+  },
+	"pre-push": [
+		"test:all"
+	]
 }

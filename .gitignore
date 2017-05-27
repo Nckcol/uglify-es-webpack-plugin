@@ -1,5 +1,11 @@
-node_modules/
 .idea/
+node_modules/
+build/
+dist/
+coverage/
 examples/node_modules/
 examples/build/
 **/*.log
+.eslintcache
+
+
