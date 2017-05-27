@@ -1,1 +1,3 @@
-function f(){ var u; return 2 + 3; }
+function f() {
+	var u; return 2 + 3;
+}
