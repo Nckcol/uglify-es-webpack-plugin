@@ -1,3 +1,4 @@
+/* @preserve Test function */
 export default function() {
 	var element = document.createElement("h1");
 

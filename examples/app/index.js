@@ -1,3 +1,5 @@
+/* @license MIT */
+
 import component from "./component";
 import "./main.css";
 

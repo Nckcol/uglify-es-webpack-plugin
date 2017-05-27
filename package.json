@@ -29,6 +29,8 @@
   },
   "devDependencies": {
     "jest": "^20.0.4",
+    "should": "^11.2.1",
+    "sinon": "^2.3.1",
     "webpack": "^2.6.0"
   }
 }

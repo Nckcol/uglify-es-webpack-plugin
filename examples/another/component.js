@@ -1,3 +1,4 @@
+/* Another comment */
 export default function() {
 	var element = document.createElement("h1");
 
