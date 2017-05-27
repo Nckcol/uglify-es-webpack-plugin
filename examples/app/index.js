@@ -1,6 +1,3 @@
-/* @license MIT */
-
-import component from "./component";
-import "./main.css";
+import component from './component';
 
 document.body.appendChild(component());

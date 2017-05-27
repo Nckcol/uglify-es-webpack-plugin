@@ -1,99 +1,36 @@
-let path = require("path");
-let UglifyJSPlugin = require("../src");
-let ExtractTextPlugin = require("extract-text-webpack-plugin");
-let HtmlWebpackPlugin = require("html-webpack-plugin");
+const path = require('path');
+const UglifyJSPlugin = require('../');
 
-let PATHS = {
-	app: path.join(__dirname, "app"),
-	another: path.join(__dirname, "another"),
-	error: path.join(__dirname, "warning"),
-	build: path.join(__dirname, "build")
+const PATHS = {
+  app: path.join(__dirname, 'app'),
+  another: path.join(__dirname, 'another'),
+  build: path.join(__dirname, 'build'),
 };
 
 module.exports = [
-	{
-		entry: {
-			app: PATHS.app
-		},
-		output: {
-			path: path.join(PATHS.build, "first"),
-			filename: "[name].js"
-		},
-		module: {
-			rules: [
-				{
-					test: /\.css$/,
-					use: ExtractTextPlugin.extract({
-						fallback: "style-loader",
-						use: "css-loader"
-					})
-				}
-			]
-		},
-		devtool: "source-map",
-		plugins: [
-			new HtmlWebpackPlugin({
-				title: "First Example"
-			}),
-			new ExtractTextPlugin("styles.css"),
-			new UglifyJSPlugin({
-				output: {
-					comments: "some"
-				},
-				extractComments: {
-					condition: "all",
-					banner: function(filename) {
-						return "Hello! See license information in " + filename;
-					}
-				}
-			}),
-		]
-	},
-	{
-		entry: {
-			first: PATHS.app,
-			second: PATHS.another
-		},
-		output: {
-			path: path.join(PATHS.build, "second"),
-			filename: "[name].js"
-		},
-		module: {
-			rules: [
-				{
-					test: /\.css$/,
-					use: ExtractTextPlugin.extract({
-						fallback: "style-loader",
-						use: "css-loader"
-					})
-				}
-			]
-		},
-		devtool: "cheap-source-map",
-		plugins: [
-			new ExtractTextPlugin("styles.css"),
-			new HtmlWebpackPlugin({
-				title: "Second Example"
-			}),
-			new UglifyJSPlugin(),
-		]
-	},
-	{
-		entry: {
-			error: PATHS.error
-		},
-		output: {
-			path: path.join(PATHS.build, "error"),
-			filename: "[name].js"
-		},
-		devtool: "source-map",
-		plugins: [
-			new UglifyJSPlugin({
-				warnings: true
-			}),
-			new HtmlWebpackPlugin({
-				title: "Error Example"
-			}),
-		]
-	}
+  {
+    entry: {
+      app: PATHS.app,
+    },
+    output: {
+      path: path.join(PATHS.build, 'first'),
+      filename: '[name].js',
+    },
+    plugins: [
+      new UglifyJSPlugin(),
+    ],
+  },
+  {
+    entry: {
+      first: PATHS.app,
+      second: PATHS.another,
+    },
+    output: {
+      path: path.join(PATHS.build, 'second'),
+      filename: '[name].js',
+    },
+    plugins: [
+      new UglifyJSPlugin(),
+    ],
+  },
 ];
